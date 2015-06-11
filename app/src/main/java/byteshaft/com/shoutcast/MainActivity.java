@@ -9,9 +9,8 @@ import java.io.IOException;
 
 import wseemann.media.FFmpegMediaPlayer;
 
-public class MainActivity extends ActionBarActivity implements
-        FFmpegMediaPlayer.OnPreparedListener, View.OnClickListener,
-        FFmpegMediaPlayer.OnErrorListener {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener,
+        FFmpegMediaPlayer.OnPreparedListener {
 
     private Button mPlaybackButton;
     private FFmpegMediaPlayer mMediaPlayer;
@@ -73,10 +72,5 @@ public class MainActivity extends ActionBarActivity implements
     public void onPrepared(FFmpegMediaPlayer fFmpegMediaPlayer) {
         mPrepared = true;
         fFmpegMediaPlayer.start();
-    }
-
-    @Override
-    public boolean onError(FFmpegMediaPlayer fFmpegMediaPlayer, int i, int i1) {
-        return false;
     }
 }
