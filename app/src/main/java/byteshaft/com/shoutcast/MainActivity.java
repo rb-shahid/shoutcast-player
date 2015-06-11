@@ -1,31 +1,68 @@
 package byteshaft.com.shoutcast;
 
-import android.content.pm.ActivityInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import java.io.IOException;
 
 import wseemann.media.FFmpegMediaPlayer;
 
+public class MainActivity extends ActionBarActivity implements View.OnClickListener,
+        FFmpegMediaPlayer.OnPreparedListener {
 
-public class MainActivity extends ActionBarActivity implements FFmpegMediaPlayer.OnPreparedListener {
+    private Button mPlaybackButton;
+    private FFmpegMediaPlayer mMediaPlayer;
+    private boolean mPrepared;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        start();
+        mPlaybackButton = (Button) findViewById(R.id.button_toggle_playback);
+        mPlaybackButton.setOnClickListener(this);
     }
 
-    private void start() {
-        FFmpegMediaPlayer mp = new FFmpegMediaPlayer();
-        mp.setOnPreparedListener(this);
-        String url = "rtmp://levelagency.com/shoutcast/caracol.stream";
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMediaPlayer = new FFmpegMediaPlayer();
+        mMediaPlayer.setOnPreparedListener(this);
+        mPlaybackButton.setText("Play");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mMediaPlayer.stop();
+        mMediaPlayer.release();
+        mMediaPlayer = null;
+        mPrepared = false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_toggle_playback:
+                if (mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.pause();
+                    mPlaybackButton.setText("Play");
+                } else if (mPrepared){
+                    mMediaPlayer.start();
+                    mPlaybackButton.setText("Pause");
+                } else {
+                    prepareAndStart();
+                    mPlaybackButton.setText("Pause");
+                }
+        }
+    }
+
+    private void prepareAndStart() {
+        String url = getString(R.string.shoutcast_url);
         try {
-            mp.setDataSource(url);
-            mp.prepareAsync();
+            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,6 +70,7 @@ public class MainActivity extends ActionBarActivity implements FFmpegMediaPlayer
 
     @Override
     public void onPrepared(FFmpegMediaPlayer fFmpegMediaPlayer) {
+        mPrepared = true;
         fFmpegMediaPlayer.start();
     }
 }
