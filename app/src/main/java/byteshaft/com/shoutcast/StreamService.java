@@ -10,6 +10,7 @@ import wseemann.media.FFmpegMediaPlayer;
 
 
 public class StreamService extends Service implements FFmpegMediaPlayer.OnPreparedListener {
+    static boolean isServiceRunning = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -18,6 +19,7 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        isServiceRunning = true;
         start();
         return START_NOT_STICKY;
     }
@@ -37,5 +39,12 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
     @Override
     public void onPrepared(FFmpegMediaPlayer fFmpegMediaPlayer) {
         fFmpegMediaPlayer.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(getApplicationContext(), StreamService.class));
+        isServiceRunning = false;
     }
 }
