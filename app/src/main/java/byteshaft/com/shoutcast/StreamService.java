@@ -1,5 +1,6 @@
 package byteshaft.com.shoutcast;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -10,8 +11,11 @@ import wseemann.media.FFmpegMediaPlayer;
 
 public class StreamService extends Service implements FFmpegMediaPlayer.OnPreparedListener {
 
+    final int ID = 404;
     private FFmpegMediaPlayer mMediaPlayer;
     private static StreamService sService;
+
+    private Notification mNotification;
 
     static StreamService getInstance() {
         return sService;
@@ -26,6 +30,10 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
     public int onStartCommand(Intent intent, int flags, int startId) {
         sService = this;
         start();
+        mNotification = new Notification(getApplicationContext());
+        android.app.Notification notification = mNotification.getNotification();
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(ID, notification);
         return START_NOT_STICKY;
     }
 
