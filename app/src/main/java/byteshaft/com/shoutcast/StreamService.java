@@ -3,7 +3,10 @@ package byteshaft.com.shoutcast;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 
 import java.io.IOException;
 
@@ -12,10 +15,8 @@ import wseemann.media.FFmpegMediaPlayer;
 public class StreamService extends Service implements FFmpegMediaPlayer.OnPreparedListener {
 
     final int ID = 404;
-    private FFmpegMediaPlayer mMediaPlayer;
+    FFmpegMediaPlayer mMediaPlayer;
     private static StreamService sService;
-
-    private Notification mNotification;
 
     static StreamService getInstance() {
         return sService;
@@ -30,7 +31,13 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
     public int onStartCommand(Intent intent, int flags, int startId) {
         sService = this;
         start();
-        mNotification = new Notification(getApplicationContext());
+        Notification mNotification = new Notification(getApplicationContext());
+        CallStateListener CallStateListener = new CallStateListener();
+        TelephonyManager telephonyManager = mNotification.getTelephonyManager();
+        telephonyManager.listen(CallStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        OutGoingCallListener OutGoingCallListener = new OutGoingCallListener();
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
+        mNotification.registerReceiver(OutGoingCallListener, intentFilter);
         android.app.Notification notification = mNotification.getNotification();
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.notify(ID, notification);
