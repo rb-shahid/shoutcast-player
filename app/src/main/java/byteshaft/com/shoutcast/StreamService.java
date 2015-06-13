@@ -3,6 +3,7 @@ package byteshaft.com.shoutcast;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -10,7 +11,9 @@ import wseemann.media.FFmpegMediaPlayer;
 
 
 public class StreamService extends Service implements FFmpegMediaPlayer.OnPreparedListener {
+
     static boolean isServiceRunning = false;
+    private FFmpegMediaPlayer mMediaPlayer;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -19,32 +22,33 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        isServiceRunning = true;
         start();
+        isServiceRunning = true;
         return START_NOT_STICKY;
     }
 
     private void start() {
-        FFmpegMediaPlayer mp = new FFmpegMediaPlayer();
-        mp.setOnPreparedListener(this);
-        String url = "rtmp://levelagency.com/shoutcast/caracol.stream";
+        mMediaPlayer = new FFmpegMediaPlayer();
+        mMediaPlayer.setOnPreparedListener(this);
+        String url = getString(R.string.shoutcast_url);
         try {
-            mp.setDataSource(url);
-            mp.prepareAsync();
+            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onPrepared(FFmpegMediaPlayer fFmpegMediaPlayer) {
-        fFmpegMediaPlayer.start();
+    public void onDestroy() {
+        super.onDestroy();
+        mMediaPlayer.stop();
+        isServiceRunning = false;
+        Log.i("Stram Service", "on destroy");
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopService(new Intent(getApplicationContext(), StreamService.class));
-        isServiceRunning = false;
+    public void onPrepared(FFmpegMediaPlayer fFmpegMediaPlayer) {
+        mMediaPlayer.start();
     }
 }
