@@ -11,6 +11,7 @@ import android.telephony.TelephonyManager;
 public class Notification extends ContextWrapper {
     final int ID = 404;
     NotificationCompat.Builder mBuilder;
+    NotificationManager mNotificationManager;
 
     public Notification(Context base) {
         super(base);
@@ -28,14 +29,15 @@ public class Notification extends ContextWrapper {
         builder.setContentText("Tap to open app");
         builder.setSmallIcon(R.mipmap.ic_launcher);
         // dismiss notification when its tapped.
-        builder.setAutoCancel(true);
+        builder.setAutoCancel(false);
         // disable slide to remove for the notification.
-        builder.setOngoing(true);
+        builder.setOngoing(false);
     }
 
     void setOnTapIntentAction(NotificationCompat.Builder builder) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(ID, builder.build());
+        mNotificationManager = (NotificationManager)
+                getSystemService(NOTIFICATION_SERVICE);
+        mNotificationManager.notify(ID, builder.build());
         Intent intent = new Intent("byteshaft.com.shoutcast.OPEN_ACTIVITY");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
@@ -43,5 +45,9 @@ public class Notification extends ContextWrapper {
 
     TelephonyManager getTelephonyManager() {
         return (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+    }
+
+    void removeNotification() {
+        mNotificationManager.cancel(ID);
     }
 }
