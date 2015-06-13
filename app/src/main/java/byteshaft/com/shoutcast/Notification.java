@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.TelephonyManager;
 
 public class Notification extends ContextWrapper {
     final int ID = 404;
@@ -27,7 +28,7 @@ public class Notification extends ContextWrapper {
         builder.setContentText("Tap to open app");
         builder.setSmallIcon(R.mipmap.ic_launcher);
         // dismiss notification when its tapped.
-        builder.setAutoCancel(false);
+        builder.setAutoCancel(true);
         // disable slide to remove for the notification.
         builder.setOngoing(true);
     }
@@ -38,5 +39,9 @@ public class Notification extends ContextWrapper {
         Intent intent = new Intent("byteshaft.com.shoutcast.OPEN_ACTIVITY");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
+    }
+
+    TelephonyManager getTelephonyManager() {
+        return (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
     }
 }
