@@ -1,0 +1,42 @@
+package byteshaft.com.shoutcast;
+
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+
+public class Notification extends ContextWrapper {
+    final int ID = 404;
+    NotificationCompat.Builder mBuilder;
+
+    public Notification(Context base) {
+        super(base);
+        mBuilder = new NotificationCompat.Builder(base);
+    }
+
+    android.app.Notification getNotification() {
+        setupVisuals(mBuilder);
+        setOnTapIntentAction(mBuilder);
+        return mBuilder.build();
+    }
+
+    private void setupVisuals(NotificationCompat.Builder builder) {
+        builder.setContentTitle("shoutcast");
+        builder.setContentText("Tap to open app");
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        // dismiss notification when its tapped.
+        builder.setAutoCancel(false);
+        // disable slide to remove for the notification.
+        builder.setOngoing(true);
+    }
+
+    void setOnTapIntentAction(NotificationCompat.Builder builder) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(ID, builder.build());
+        Intent intent = new Intent("byteshaft.com.shoutcast.OPEN_ACTIVITY");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        builder.setContentIntent(pendingIntent);
+    }
+}
