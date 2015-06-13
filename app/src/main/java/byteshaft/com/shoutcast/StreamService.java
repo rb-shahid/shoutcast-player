@@ -17,6 +17,7 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
     final int ID = 404;
     FFmpegMediaPlayer mMediaPlayer;
     private static StreamService sService;
+    Notification mNotification;
 
     static StreamService getInstance() {
         return sService;
@@ -31,7 +32,7 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
     public int onStartCommand(Intent intent, int flags, int startId) {
         sService = this;
         start();
-        Notification mNotification = new Notification(getApplicationContext());
+        mNotification = new Notification(getApplicationContext());
         CallStateListener CallStateListener = new CallStateListener();
         TelephonyManager telephonyManager = mNotification.getTelephonyManager();
         telephonyManager.listen(CallStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -62,6 +63,7 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
         super.onDestroy();
         mMediaPlayer.stop();
         mMediaPlayer.release();
+        mNotification.removeNotification();
         sService = null;
     }
 
