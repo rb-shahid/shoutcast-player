@@ -9,9 +9,9 @@ import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
 
 public class Notification extends ContextWrapper {
-    final int ID = 404;
+    final static int ID = 404;
     NotificationCompat.Builder mBuilder;
-    NotificationManager mNotificationManager;
+    private static NotificationManager mNotificationManager;
 
     public Notification(Context base) {
         super(base);
@@ -47,7 +47,9 @@ public class Notification extends ContextWrapper {
         return (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
     }
 
-    void removeNotification() {
-        mNotificationManager.cancel(ID);
+    static void removeNotification() {
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(ID);
+        }
     }
 }
