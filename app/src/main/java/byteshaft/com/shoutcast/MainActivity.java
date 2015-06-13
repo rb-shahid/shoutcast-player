@@ -1,20 +1,14 @@
 package byteshaft.com.shoutcast;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 
-import java.io.IOException;
-
-import wseemann.media.FFmpegMediaPlayer;
-
-public class MainActivity extends ActionBarActivity implements View.OnClickListener,
-        FFmpegMediaPlayer.OnPreparedListener {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     private Button mPlaybackButton;
-    private FFmpegMediaPlayer mMediaPlayer;
-    private boolean mPrepared;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,50 +21,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        mMediaPlayer = new FFmpegMediaPlayer();
-        mMediaPlayer.setOnPreparedListener(this);
-        mPlaybackButton.setText("Play");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mMediaPlayer.stop();
-        mMediaPlayer.release();
-        mMediaPlayer = null;
-        mPrepared = false;
+        if (StreamService.getInstance() != null) {
+            mPlaybackButton.setText("stop");
+        } else {
+            mPlaybackButton.setText("play");
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_toggle_playback:
-                if (mMediaPlayer.isPlaying()) {
-                    mMediaPlayer.pause();
+                if (StreamService.getInstance() != null) {
+                    stopService(new Intent(getApplicationContext(), StreamService.class));
                     mPlaybackButton.setText("Play");
-                } else if (mPrepared){
-                    mMediaPlayer.start();
-                    mPlaybackButton.setText("Pause");
                 } else {
-                    prepareAndStart();
-                    mPlaybackButton.setText("Pause");
+                    startService(new Intent(getApplicationContext(), StreamService.class));
+                    mPlaybackButton.setText("stop");
                 }
         }
-    }
-
-    private void prepareAndStart() {
-        String url = getString(R.string.shoutcast_url);
-        try {
-            mMediaPlayer.setDataSource(url);
-            mMediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onPrepared(FFmpegMediaPlayer fFmpegMediaPlayer) {
-        mPrepared = true;
-        fFmpegMediaPlayer.start();
     }
 }
