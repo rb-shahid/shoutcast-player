@@ -28,7 +28,7 @@ public class Notification extends ContextWrapper {
         builder.setContentText("Tap to open app");
         builder.setSmallIcon(R.mipmap.ic_launcher);
         // dismiss notification when its tapped.
-        builder.setAutoCancel(false);
+        builder.setAutoCancel(true);
         // disable slide to remove for the notification.
         builder.setOngoing(true);
     }

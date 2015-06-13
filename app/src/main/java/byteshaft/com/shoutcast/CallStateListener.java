@@ -15,6 +15,8 @@ public class CallStateListener extends PhoneStateListener {
                     StreamService.getInstance().mMediaPlayer.pause();
                 }
                 break;
+            case TelephonyManager.CALL_STATE_IDLE:
+                StreamService.getInstance().mMediaPlayer.start();
         }
     }
 }

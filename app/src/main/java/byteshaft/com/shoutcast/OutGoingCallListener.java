@@ -6,7 +6,6 @@ import android.content.Intent;
 
 public class OutGoingCallListener extends BroadcastReceiver {
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
         String number = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
