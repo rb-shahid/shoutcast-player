@@ -19,15 +19,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (StreamService.getInstance() != null) {
+            mPlaybackButton.setText("stop");
+        } else {
+            mPlaybackButton.setText("play");
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_toggle_playback:
-                if (StreamService.isServiceRunning) {
+                if (StreamService.getInstance() != null) {
                     stopService(new Intent(getApplicationContext(), StreamService.class));
                     mPlaybackButton.setText("Play");
-                } else if (!StreamService.isServiceRunning){
+                } else {
                     startService(new Intent(getApplicationContext(), StreamService.class));
-                    mPlaybackButton.setText("Pause");
+                    mPlaybackButton.setText("stop");
                 }
         }
     }

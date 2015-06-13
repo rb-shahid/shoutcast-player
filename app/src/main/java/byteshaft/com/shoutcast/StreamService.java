@@ -3,17 +3,19 @@ package byteshaft.com.shoutcast;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import java.io.IOException;
 
 import wseemann.media.FFmpegMediaPlayer;
 
-
 public class StreamService extends Service implements FFmpegMediaPlayer.OnPreparedListener {
 
-    static boolean isServiceRunning = false;
     private FFmpegMediaPlayer mMediaPlayer;
+    private static StreamService sService;
+
+    static StreamService getInstance() {
+        return sService;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -22,8 +24,8 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        sService = this;
         start();
-        isServiceRunning = true;
         return START_NOT_STICKY;
     }
 
@@ -43,8 +45,8 @@ public class StreamService extends Service implements FFmpegMediaPlayer.OnPrepar
     public void onDestroy() {
         super.onDestroy();
         mMediaPlayer.stop();
-        isServiceRunning = false;
-        Log.i("Stram Service", "on destroy");
+        mMediaPlayer.release();
+        sService = null;
     }
 
     @Override
